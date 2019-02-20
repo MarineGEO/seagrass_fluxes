@@ -1,0 +1,21 @@
+---
+title: "Seagrass Fluxes"
+author: "Jon Lefcheck"
+date: "February 20, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Seagrass Food Webs: A Collaborative Survey
+
+Seagrasses are an important foundational species worldwide (Orth et al. 2006), and support abundant and diverse communities of flora and fauna (Orth et al. 1984, Duffy & Valentine 2006). These communities include primary producers, such as the seagrass itself, epiphytic microalgae, and macroalgae, small invertebrate grazers, mesopredators such as crabs and fishes, and juveniles and adults of larger predators who seek out the beds to forage. The herbivorous grazers in particular play a prominent role in the seagrass food web: they are the critical link between producers and larger mobile consumers, and further facilitate seagrass growth by removing fouling epiphytes in a well-studied mutualism (Orth & van Montfrans 1984, Neckles et al. 1993, Duffy et al 2003, 2016). Yet, few studies have attempted to quantify the the energy moving through these organisms and out into the broader ecosystem. Early work on rocky shores suggested that 78-97% of secondary production was contributed by small invertebrates (<10 mm) (Taylor 1993), and a series of papers from Australia suggested between 7-58% of invertebrate production was consumed by small fishes (Edgar & Shaw 1995a,b,c). Moreover, these papers showed that the level of productivity and consumption varied taxonomically and, critically, based on abiotic conditions, principally temperature and substrate type (vegetated vs unvegetated).
+
+## Estimating Energy Fluxes
+
+
+## Large-scale Patterns in Community Structure
+
+## A Worked Example
