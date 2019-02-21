@@ -7,16 +7,8 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-```
+knitr::opts_knit$set(root.dir = getwd())
 
-This is a worked example of how to compute energy fluxes through seagrass food webs in R. The data come from a long-term survey of seagrass communities at Goodwin Island in the York River Estuary, Chesapeake Bay, USA monthly from 2007-2013. Sampling consisted of two transects laid parallel to shore (one inshore and one offshore). Five samples were randomly taken along each transect for a total _n_ = 10 per month. More details can be found in: Douglass, J. G., Douglass, J. G., France, K. E., France, K. E., Richardson, J. P., & Duffy, J. E. (2010). Seasonal and interannual change in a Chesapeake Bay eelgrass community: insights into biotic and abiotic control of community structure. Limnology and Oceanography, 55(4), 1499-1520.
-
-## Data Preparation
-
-First, we will briefly explain and clean up the data.
-
-
-```{r} 
 # load required libraries
 library(fluxweb)
 library(nlme)
@@ -28,11 +20,17 @@ library(tidyverse)
 years <- c(2007:2013)
 ```
 
+This is a worked example of how to compute energy fluxes through seagrass food webs in R. The data come from a long-term survey of seagrass communities at Goodwin Island in the York River Estuary, Chesapeake Bay, USA monthly from 2007-2013. Sampling consisted of two transects laid parallel to shore (one inshore and one offshore). Five samples were randomly taken along each transect for a total _n_ = 10 per month. More details can be found in: Douglass, J. G., Douglass, J. G., France, K. E., France, K. E., Richardson, J. P., & Duffy, J. E. (2010). Seasonal and interannual change in a Chesapeake Bay eelgrass community: insights into biotic and abiotic control of community structure. Limnology and Oceanography, 55(4), 1499-1520.
+
+## Data Preparation
+
+First, we will briefly explain and clean up the data.
+
 Primary producers were sampled in several ways. First, a 15-cm diameter biomass core was taken at each replicate to quantify above- and belowground biomasses of seagrasses (two species: _Zostera marina_ and _Ruppia maritima_), which also included drift macroalgae. Samples were taken back to the lab and dried to constant weight (in g). These values were further scaled to 1 m^2 of bottom area.
 
 ```{r}
 # load biomass core data
-grass <- read.csv("Data/grass.csv")
+grass <- read.csv("./Data/grass.csv")
 
 
 # scale grass/macroalgal dry weight to 1 m^2 bottom area
@@ -43,7 +41,7 @@ Second, a single shoot of _Zostera marina_ was collected at each replicate, brou
 
 ```{r}
 # load epiphyte data
-epi <- read.csv("Data/epi.csv")
+epi <- read.csv("./Data/epi.csv")
 
 
 # compute epiphytic chl-a in ug using trichromatic equations
@@ -115,7 +113,10 @@ grass <- filter(grass, !species.name.revised %in% c("Zostera marina blades", "Ru
 Next, we sampled epifaunal invertebrates using a grab sample. Samples were taken back to the lab, and associated macrophytes dried and weighed. Invertebrates were sorted to species, then passed through a series of nested sieves to obtain size-fractionated abundance. Biomass was estimated from these values using the equations in Edgar (1991), normalized to macrophyte biomass, and then expressed per m^2 of bottom area.
 
 ```{r}
-bugs <- read.csv("Data/bugs.csv")
+bugs <- read.csv("./Data/bugs.csv")
+
+# get function to apply Edgar equations
+source("https://gist.githubusercontent.com/jslefche/c480eeb2ad67ca7c9a46/raw/177e47862e4053337cca66e94f5f0b91d5e7086f/edgarMethod.R")
 
 # compute bug biomass from size fractionated abundances
 bugs <- filter(bugs, group %in% c("Crustacean", "Mollusc", "Polychaete", "Caprellid"))
@@ -131,7 +132,7 @@ bugs[, grepl("abund|biomass", colnames(bugs))] <- bugs[, grepl("abund|biomass", 
 Mesopredators were censused using a 5-m dip-net sweep perpendicular to the main transect. All organisms were measured (total length for fishes, carapace width for crabs) and biomass was estimated using length-weight regressions from FishBase or Fredette & Diaz (1990). The final values were then expressed per m^2 of bottom area.
 
 ```{r}
-preds <- read.csv("Data/preds.csv")
+preds <- read.csv("./Data/preds.csv")
 
 # compute predator biomass from L-W regressions
 predB <- function(x) {
@@ -174,7 +175,7 @@ preds[, grepl("abundance|biomass", colnames(preds))] <- preds[, grepl("abundance
 Finally, abiotic parameters were measured using an in situ data sonde maintained by the Chesapeake Bay NERR and located within the seagrass bed. Values are daily averages.
 
 ```{r}
-env <- read.csv("C:/Users/jslef/Desktop/env.csv")
+env <- read.csv("./Data/env.csv")
 ```
 
 ## Quantifying Trophic Relationships
@@ -436,6 +437,4 @@ rsquared(predation.mod)
 ```
 
 These models could be further refined to show the indirect effect of temperature on biodiversity using techniques like structural equation modeling.
-
-
 
