@@ -1,2 +1,3 @@
-# seagrass_fluxes
-Seagrass Food Webs
+# Seagrass Fluxes: A Worked Example
+
+The following document is a worked example of how to compute energy fluxes through seagrass food webs. The data come from a monthly survey of seagrass communities at Goodwin Island in the York River Estuary, Chesapeake Bay, USA from 2007-2013. Sampling consisted of two transects laid parallel to shore (one inshore and one offshore). Five samples were randomly taken along each transect for a total _n_ = 10 per month. More details can be found in: Douglass et al. (2010).
