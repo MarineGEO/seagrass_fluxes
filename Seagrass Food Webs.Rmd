@@ -423,6 +423,7 @@ We can use linear models to test the independent effects of each of these proper
 herbivory.mod <- lme(log10(value) ~ log10(richness) + log10(temp) + log10(sal), random = list(year = ~1, month = ~1), data = subset(fluxes, flux == "Herbivory"))
 
 kable(coefs(herbivory.mod), caption = "Output from LMM of fluxes to herbivores.")
+
 ```
 
 
@@ -442,6 +443,7 @@ We can repeat this exercise for predators:
 predation.mod <- lme(log10(value) ~ log10(richness) + log10(temp) + log10(sal), random = list(year = ~1, month = ~1), data = subset(fluxes, flux == "Predation"))
 
 kable(coefs(predation.mod), caption = "Output from LMM of fluxes to predators.")
+
 ```
 
 
