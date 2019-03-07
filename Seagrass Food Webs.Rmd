@@ -1,7 +1,7 @@
 ---
 title: "Seagrass Fluxes"
 author: "Jon Lefcheck"
-date: "February 22, 2019"
+date: "March 8, 2019"
 output: html_document
 ---
 
@@ -21,13 +21,13 @@ library(tidyverse)
 years <- c(2007:2013)
 ```
 
-The following document is a worked example of how to compute energy fluxes through seagrass food webs. The data come from a monthly survey of seagrass communities at Goodwin Island in the York River Estuary, Chesapeake Bay, USA from 2007-2013. Sampling consisted of two transects laid parallel to shore (one inshore and one offshore). Five samples were randomly taken along each transect for a total _n_ = 10 per month. More details can be found in: Douglass et al. (2010).
+The following document is a worked example of how to compute energy fluxes through seagrass food webs. The data come from a monthly survey (March-November) of seagrass communities at Goodwin Island in the York River Estuary, Chesapeake Bay, USA from 2007-2013. Sampling consisted of two transects laid parallel to shore (one inshore and one offshore). Five samples were randomly taken along each transect for a total _n_ = 10 per month. More details can be found in: Douglass et al. (2010).
 
 ### Data Preparation
 
 First, we will briefly explain, load, and clean the data used in the analysis.
 
-Primary producers were sampled in several ways. First, a 15-cm diameter biomass core was taken at each replicate to quantify above- and belowground biomasses of seagrasses (two species: _Zostera marina_ and _Ruppia maritima_) and drift macroalgae. Samples were taken back to the lab and dried to constant weight (in g). These values were further scaled to 1 m^2^ of bottom area.
+Primary producers were sampled in several ways. First, a 15-cm diameter biomass core was taken at each replicate to quantify above- and belowground biomasses of seagrasses (two species: _Zostera marina_ and _Ruppia maritima_) and drift macroalgae. Samples were taken back to the lab and dried to constant weight. These values were further scaled to 1 m^2^ of bottom area.
 
 ```{r}
 # load biomass core data
@@ -38,7 +38,7 @@ grass <- read.csv("./Data/grass.csv")
 grass$dm <- grass$dm * (1 / (pi * (0.15/2)^2))
 ```
 
-Second, a single shoot of _Zostera marina_ was collected at each replicate, brought back to the lab and scraped of epiphytes. The epiphytes were filtered, extracted in 90% acetone, and then absorbances measured using a spectrophotometer. These values were converted to biomass using the trichromatic equations of Lorenzen (1967), and standardized to leaf area. 
+Second, a single shoot of _Zostera marina_ was collected at each replicate, brought back to the lab and scraped of epiphytes. The epiphytes were filtered, extracted in 90% acetone, and then absorbances measured using a spectrophotometer. These values were converted to biomass using the trichromatic equations of Lorenzen (1967), and standardized to leaf dry weight.
 
 ```{r}
 # load epiphyte data
@@ -109,9 +109,9 @@ epi$species.name.revised <- "epiphytic.algae"
 grass <- filter(grass, !species.name.revised %in% c("Zostera marina blades", "Ruppia maritima blades"))
 ```
 
-In lieu of this procedure, which requires specialized equipment, seagrass blades could be scraped, dried, and weighed to obtain an estimate of total fouling biomass. This procedure would include organisms other than epiphytes, like sessile animals and detritus, but arguably the organisms are feeding on these resources as well.
+In lieu of the above procedure, which requires specialized equipment to measure spectrophotometric absorbances, seagrass blades could be scraped, and both blades and fouling materials dried and weighed to obtain an estimate of total biomass. This procedure might capture organisms other than epiphytes, like sessile animals and detritus, but arguably the fauna are feeding on these resources as well, so they could reasonably be included (or contribute to the error variance). The resulting values could then be scaled to bottom area using estimates of shoot density or, less ideally, destructive biomass cores.
 
-Next, we sampled epifaunal invertebrates using a grab sample at each replicate. Samples were taken back to the lab, and associated macrophytes dried and weighed. Invertebrates were sorted to species, then passed through a series of nested sieves to obtain size-fractionated abundances. Biomass was estimated from these values using the equations in Edgar (1990), standardized to total macrophyte biomass, and then expressed per m^2^ of bottom area.
+Next, we sampled epifaunal invertebrates using a grab sample at each replicate. Samples were taken back to the lab, and associated macrophytes (seagrasses and algae) dried and weighed. Invertebrates were sorted to species, then passed through a series of nested sieves to obtain size-fractionated abundances. Biomass was estimated from these values using the equations in Edgar (1990), standardized to total macrophyte biomass, and then expressed per m^2^ of bottom area.
 
 ```{r}
 bugs <- read.csv("./Data/bugs.csv")
@@ -130,7 +130,7 @@ bugs$total.biomass.g <- bugs$total.biomass / 1000
 bugs[, grepl("abund|biomass", colnames(bugs))] <- bugs[, grepl("abund|biomass", colnames(bugs))] * (1 / (0.2 * 0.2))
 ```
 
-Mesopredators were censused using a 5-m dip-net sweep perpendicular to the main transect. All organisms were measured (total length for fishes, carapace width for crabs) and biomass was estimated using length-weight regressions from FishBase or Fredette & Diaz (1990). The final values were then expressed per m^2^ of bottom area.
+Mesopredators were censused using a 5-m dip-net sweep perpendicular to the main transect at each replicate location. All organisms were measured (total length for fishes, carapace width for crabs) and biomass was estimated using length-weight regressions from FishBase or Fredette & Diaz (1990). The final values were then expressed in g per m^2^ of bottom area.
 
 ```{r}
 preds <- read.csv("./Data/preds.csv")
@@ -181,9 +181,11 @@ env <- read.csv("./Data/env.csv")
 
 ### Quantifying Trophic Relationships
 
-The framework from Barnes et al. requires knowledge of basic trophic relationships. These can be extremely general (e.g., herbivores, carnivores) or highly-resolved (e.g., detritivorous amphipods, omnivorous fishes). For this example, we will draw on a priori knowledge of the trophic roles of organisms to construct a very rudimentary food web (primary producers -> herbivores -> predators). This effort could be further resolved using relationships derived from the literature (see Lefcheck (2015) for an example from this region), and trophic position of fishes can be obtained from FishBase. As a last resort, diet could be imputed from taxonomy/phylogeny.
+The framework from Barnes et al. requires knowledge of basic trophic relationships. These can be extremely general (e.g., herbivores, carnivores) or highly-resolved (e.g., detritivorous amphipods, omnivorous fishes). 
 
-The final diet matrix consists of an _s_ -by- _s_ matrix of _s_ species, with a 1 if the species in column _j_ consumes the organisms in row _i_, and a 0 if they do not interact.
+For this example, we will draw on a priori knowledge of the trophic roles of organisms to construct a very rudimentary food web (primary producers -> herbivores -> predators). This effort could be further resolved using relationships derived from the literature (see Lefcheck (2015) for an example from this region), and trophic position of fishes can be obtained from FishBase. As a last resort, diet could be imputed from taxonomy/phylogeny.
+
+The final diet matrix consists of an _s_ -by- _s_ matrix of _s_ species, with a 1 if the organism in column _j_ consumes the organism in row _i_, and a 0 if they do not interact.
 
 ```{r}
 # get vector of primary producer names
@@ -217,6 +219,7 @@ Population-specific metabolic rates are estimated using average body size and eq
 
 The intercept ($I_0$) and exponent $b$ can be clarified based on whether the organism is an inverberate or ectothermic (fishes) (see Table 1, Gauzens et al. (2018)).
 
+This equation could be expanded to include the modulating effect of temperature *T*: $$I = I_0M^{b}e^{0.63/kT}$$. Both applications are interesting and provide different information. We proceed with the simpler application here, but calculating temperature dependent and independent metabolic rates and comparing the resulting values could give an idea of the direct (metabolic) vs. indirect role of temperature in determining eneryg flux.
 
 ```{r}
 # get vector of average biomasses to scale losses (per g  biomass)
@@ -247,8 +250,6 @@ losses <- constants[match(names(bodymasses), constants$species), "a"] * bodymass
   constants[match(names(bodymasses), constants$species), "b"]
 ```
 
-This equation could further incorporate the effects of temperature on metabolic rates (eqn. 4, Brown et al. (2004)). In fact, comparing estimated fluxes with and without a scaling parameter for temperature would be very enlightening, allowing us to disentangle the direct (with) and indirect (without) effects of temperature on metabolic losses. For purposes of simplicity, we will proceed with the estimates derived from body size alone.
-
 Similarly, feeding efficiences can be estimated from literature values (see Lang et al. (2017)) based on whether the organisms are plants, animals, or detritus. 
 
 ```{r}
@@ -262,7 +263,7 @@ efficiences <- eff[org.types]
 names(efficiences) <- names(losses)
 ```
 
-We now have all the information necessary to compute fluxes using the `fluxweb` package. In this case, we will compute the total biomass across all 10 replicates (which is more representative of the whole food web), and divide by 10 (or the actual number of replicates, if any were lost) to obtain the flux per m^2^. We will also weight the prey preferences by total biomass of their prey to account for month-to-month differences in population-level biomasses.
+We now have all the information necessary to compute fluxes using the `fluxweb` package. In this case, we will compute the total biomass across all 10 replicates (which is more representative of the whole food web), and divide by 10 (or the actual number of replicates, if any were lost) to obtain the flux per m^2^. We will also weight the prey preferences by total biomass of their prey to account for the month-to-month differences in population-level biomasses.
 
 ```{r message=F, warning=F}
 # compute fluxes for each month
@@ -359,11 +360,9 @@ ggplot(fluxes.summary, aes(x = as.factor(month), y = mean.value)) +
   )
 ```
 
-We see that fluxes are quite low in the colder winter months (March, April, November) but increase rapidly in the spring though mid-summer, when production is highest (July). There is a dip in August, when eelgrass naturally senesces in this part of the world. There is a slight bump in the early fall due to the slight resurgence in seagrass during this period, but by then much of the faunal community has emigrated from the Bay. Notably and expectedly, fluxes are lower to predators than to herbivores due to decreasing efficiency with trophic level.
+We see that fluxes from both primary producers (herbivory) and herbivores (predation) are quite low in the colder winter months (March, April, November) but increase rapidly in the spring though mid-summer, when production is highest (July). There is a dip in August, when eelgrass naturally senesces in this part of the world, therefore removing much of the habitat. There is a slight bump in the early fall due to the minor resurgence in seagrass during this period, but by then much of the faunal community has emigrated from the Bay. Notably and expectedly, herbivores remove more energy from producers than predators do frmo herbivores, because more energy is lost by the herbivores through metabolism.
 
-It is easy to see how this plot would function for the proposed work, with a space-for-time substitution. The x-axis could be latitude or any other spatially-structured variable.
-
-We can further relate these values to the biotic and abiotic properties of the ecosystem. For example, the original derivation of this framework focused on how community diversity influenced fluxes. Theory suggests that more diverse communities are more efficient at using available resources (Cardinale et al. (2012)), translating to higher energy flux.
+We can further relate these values to the biotic and abiotic properties of the ecosystem. For example, the original derivation of this framework focused on how community diversity influenced fluxes (Barnes et al. 2018). Theory suggests that more diverse communities are more efficient at using available resources (Cardinale et al. (2012)), translating to higher energy flux.
 
 ```{r  echo=F, message=F, warning=F}
 # plot against diversity
@@ -389,7 +388,7 @@ ggplot() +
   )
 ```
 
-Here, we see that predator richness enhances fluxes, but they are largely unaffected by changes in herbivore diversity. This supports the now well-described increase in diversity effects with increasing trophic level (Lefcheck et al. (2015), O'Connor et al. (2017)).
+Here, we see that increasing predator richness enhances the amount of energy removed from herbivores, but fluxes from producres are largely unaffected by changes in herbivore diversity. This supports the now well-described increase in diversity effects with increasing trophic level (Lefcheck et al. (2015), O'Connor et al. (2017)).
 
 Similarly, metabolic theory proposes that higher temperatures should drive greater fluxes due to higher metabolic demands:
 
@@ -418,7 +417,7 @@ ggplot() +
 
 Indeed, as temperature increases, the estimated fluxes to both herbivores and predators increases (although non-linearly, note the log-transformation).
 
-We can use linear models to test the independent effects of each of these properties--and others, like salinity--while controlling for the contributions of the others and accounting for temporal autocorrelation (months within a year, among years). This analysis will tell us whether biodiversity is still important given the influence of temperature.
+We can use linear models to test the independent effects of each of these properties--and others, for example: salinity--while controlling for the contributions of the others and accounting for temporal autocorrelation (months within a year, among years). This analysis will tell us whether biodiversity is still important given the well-known influence of temperature.
 
 ```{r echo=F, message=F}
 herbivory.mod <- lme(log10(value) ~ log10(richness) + log10(temp) + log10(sal), random = list(year = ~1, month = ~1), data = subset(fluxes, flux == "Herbivory"))
@@ -426,12 +425,13 @@ herbivory.mod <- lme(log10(value) ~ log10(richness) + log10(temp) + log10(sal), 
 kable(coefs(herbivory.mod), caption = "Output from LMM of fluxes to herbivores.")
 ```
 
+
 Here, we see that both environmental parameters significantly influence fluxes to herbivores ($P$ < 0.001 in both cases), while richness is not significant after controlling for both temperature and salinity (as seen above).
 
-```{r echo=F, message=F}
+```{r echo=F, message=F, results="hide"}
 herbivory.mod <- lme(log10(value) ~ log10(richness) + log10(temp) + log10(sal), random = list(year = ~1, month = ~1), data = subset(fluxes, flux == "Herbivory"))
 
-kable(rsquared(herbivory.mod), caption = "Model R^2^ values for fluxes to herbivores.")
+rsquared(herbivory.mod)
 ```
 
 Examining the R^2^ values for the model, we've explained 39% of the variance in herbivore fluxes with these three variables alone (marginal R^2^), with a further 54% explained by the random factors (time, conditional R^2^).
@@ -444,12 +444,13 @@ predation.mod <- lme(log10(value) ~ log10(richness) + log10(temp) + log10(sal), 
 kable(coefs(predation.mod), caption = "Output from LMM of fluxes to predators.")
 ```
 
+
 Like herbivores, both environmental variables significantly predict fluxes to predators. Unlike herbivores, predator richness significantly enhances fluxes independent of abiotic conditions ($P$ < 0.001). In fact, the standardized estimate suggests that the efect of richness (in units of standard deviations of the mean) is approximately twice that of temperature, suggesting a much larger increase in fluxes due to 1 S.D. increase in predator richness relative to a 1 S.D. increase in temperature (surprising given the relatively low range of predator richness: 1-6, vs. the range of temperature: 9.5-27.7 C). 
 
-```{r echo=F, message=F}
+```{r echo=F, message=F, results="hide"}
 predation.mod <- lme(log10(value) ~ log10(richness) + log10(temp) + log10(sal), random = list(year = ~1, month = ~1), data = subset(fluxes, flux == "Predation"))
 
-kable(rsquared(predation.mod), caption = "Model R^2^ values for fluxes to carnivores.")
+rsquared(predation.mod)
 ```
 
 Even more variation is explained by these three variables for predator fluxes: 64% based on the fixed effects alone, and 96% based on the fixed and random effects.
@@ -458,7 +459,7 @@ These models could be further refined to show the indirect effect of temperature
 
 ### Conclusions
 
-This short worked example demonstrates that energy fluxes can indeed be computed for multitrophic seagrass food webs using fairly straightforward observational surveys. Furthermore, interesting temporal and biotic/abiotic trends were recovered from the data using only a moderate sample size ($n$ = 68) that agree with predictions from ecological and metabolic theory. The proposed work through MarineGEO has the potential to substantially expand the range of biotic/abiotic conditions and provide a more general test of these hypotheses.
+This short worked example demonstrates that energy fluxes can indeed be computed for multitrophic seagrass food webs using fairly straightforward observational surveys. Furthermore, interesting temporal and biotic/abiotic trends were recovered from the data using only a moderate sample size ($n$ = 68) that agree with predictions from ecological and metabolic theory. We propose substituting spatial variation in the proposed work (rather than measuring a time series in a single place). Sampling coordinated through MarineGEO has the potential to substantially expand the range of biotic/abiotic conditions and provide a more general test of these hypotheses.
 
 ### References
 
