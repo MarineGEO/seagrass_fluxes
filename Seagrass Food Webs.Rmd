@@ -481,6 +481,6 @@ Lefcheck, J. S. (2015). The use of functional traits to elucidate the causes and
 
 Lefcheck, J. S., Byrnes, J. E., Isbell, F., Gamfeldt, L., Griffin, J. N., Eisenhauer, N., ... & Duffy, J. E. (2015). Biodiversity enhances ecosystem multifunctionality across trophic levels and habitats. Nature communications, 6, 6936.
 
-Lorenzen, C. J. (1967). Determinatino of chlorophyll and pheo-pigments: Spectrophotometric equations 1. Limnology and Oceanography, 12(2), 343-346.
+Lorenzen, C. J. (1967). Determination of chlorophyll and pheo-pigments: Spectrophotometric equations. Limnology and Oceanography, 12(2), 343-346.
 
 O'Connor, M. I., Gonzalez, A., Byrnes, J. E., Cardinale, B. J., Duffy, J. E., Gamfeldt, L., ... & Thompson, P. L. (2017). A general biodiversity-function relationship is mediated by trophic level. Oikos, 126(1), 18-31.
