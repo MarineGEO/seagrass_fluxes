@@ -1,7 +1,7 @@
 ---
 title: "Seagrass Fluxes"
 author: "Jon Lefcheck"
-date: "March 8, 2019"
+date: "April 12, 2019"
 output: html_document
 ---
 
@@ -219,7 +219,7 @@ Population-specific metabolic rates are estimated using average body size and eq
 
 The intercept ($I_0$) and exponent $b$ can be clarified based on whether the organism is an inverberate or ectothermic (fishes) (see Table 1, Gauzens et al. (2018)).
 
-This equation could be expanded to include the modulating effect of temperature *T*: $$I = I_0M^{b}e^{0.63/kT}$$. Both applications are interesting and provide different information. We proceed with the simpler application here, but calculating temperature dependent and independent metabolic rates and comparing the resulting values could give an idea of the direct (metabolic) vs. indirect role of temperature in determining eneryg flux.
+This equation could be expanded to include the modulating effect of temperature *T*: $$I = I_0M^{b}e^{0.63/kT}$$ Both applications are interesting and provide different information. We proceed with the simpler application here, but calculating temperature dependent and independent metabolic rates and comparing the resulting values could give an idea of the direct (metabolic) vs. indirect role of temperature in determining energy flux.
 
 ```{r}
 # get vector of average biomasses to scale losses (per g  biomass)
@@ -447,7 +447,7 @@ kable(coefs(predation.mod), caption = "Output from LMM of fluxes to predators.")
 ```
 
 
-Like herbivores, both environmental variables significantly predict fluxes to predators. Unlike herbivores, predator richness significantly enhances fluxes independent of abiotic conditions ($P$ < 0.001). In fact, the standardized estimate suggests that the efect of richness (in units of standard deviations of the mean) is approximately twice that of temperature, suggesting a much larger increase in fluxes due to 1 S.D. increase in predator richness relative to a 1 S.D. increase in temperature (surprising given the relatively low range of predator richness: 1-6, vs. the range of temperature: 9.5-27.7 C). 
+Like herbivores, both environmental variables significantly predict fluxes to predators. Unlike herbivores, predator richness significantly enhances fluxes independent of abiotic conditions ($P$ < 0.001). In fact, the standardized estimate suggests that the efect of richness (in units of standard deviations of the mean) is approximately twice that of temperature, suggesting a much larger increase in fluxes due to 1 S.D. increase in predator richness relative to a 1 S.D. increase in temperature (surprising given the relatively low range of predator richness: 1-6, vs. the range of temperature: 9.5-27.7 &deg;C). 
 
 ```{r echo=F, message=F, results="hide"}
 predation.mod <- lme(log10(value) ~ log10(richness) + log10(temp) + log10(sal), random = list(year = ~1, month = ~1), data = subset(fluxes, flux == "Predation"))
